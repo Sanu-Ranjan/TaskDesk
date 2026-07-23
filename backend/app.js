@@ -3,7 +3,7 @@ const cors = require("cors");
 
 const { API_ROUTES } = require("./constants/apiRoutes");
 // const tasks = require("./routes/tasks.route");
-// const auth = require("./routes/auth.route");
+const auth = require("./routes/auth.route");
 // const teams = require("./routes/teams.route");
 // const projects = require("./routes/projects.route");
 // const tags = require("./routes/tags.route");
@@ -30,7 +30,7 @@ app.get(API_ROUTES.home, (req, res) => {
   res.send("Welcome to Workasana Api");
 });
 
-// app.use(API_ROUTES.auth, auth.router);
+app.use(API_ROUTES.auth, auth.router);
 // app.use(API_ROUTES.tasks, tasks.router);
 // app.use(API_ROUTES.teams, teams.router);
 // app.use(API_ROUTES.projects, projects.router);
