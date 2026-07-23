@@ -1,5 +1,7 @@
-const User = require("../models/User");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+
+const User = require("../models/User");
 const { SALT_ROUNDS } = require("../constants/index");
 
 const signup = async (req, res) => {
@@ -38,7 +40,43 @@ const signup = async (req, res) => {
   }
 };
 
-const login = async (req, res) => {};
+const login = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    if (!email || !password) {
+      return res.status(400).json(failure("email and password are required"));
+    }
+
+    const { data: user, error } = await dbTask(() => User.findOne({ email }));
+    if (error) {
+      console.log("Error finding existing user : ", error);
+      return dbError(res);
+    }
+    if (!user) {
+      return res.status(401).json(failure("Invalid email or password"));
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json(failure("Invalid email or password"));
+    }
+
+    const jwt_secret = process.env.JWT_SECRET;
+    const token = jwt.sign({ name: user.name, email: user.email }, jwt_secret, {
+      expiresIn: "24h",
+    });
+
+    res.cookie("token", token, {
+      maxAge: 24 * 60 * 60 * 1000,
+      path: "/",
+    });
+
+    return res.status(200).json(success(null, "User logged in"));
+  } catch (error) {
+    console.log("Error at controller : login ", error);
+    return serverError(res);
+  }
+};
 
 const me = async (req, res) => {};
 
