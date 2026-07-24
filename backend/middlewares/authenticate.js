@@ -1,3 +1,7 @@
+const jwt = require("jsonwebtoken");
+
+const { failure, serverError, dbError } = require("../utils/res");
+
 async function authenticate(req, res, next) {
   try {
     const token = req.cookies?.token;
@@ -9,6 +13,7 @@ async function authenticate(req, res, next) {
     try {
       decoded = jwt.verify(token, process.env.JWT_SECRET);
     } catch (err) {
+      console.log("Error: ", err);
       return res.status(401).json(failure("Invalid or expired token"));
     }
 
