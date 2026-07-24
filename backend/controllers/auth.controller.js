@@ -2,7 +2,8 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
 const User = require("../models/User");
-const { SALT_ROUNDS } = require("../constants/index");
+const { SALT_ROUNDS, JWT_EXPIRES_IN } = require("../constants/index");
+const cookieConfig = require("../constants/cookie");
 const { dbError, failure, serverError, success } = require("../utils/res");
 const { dbTask } = require("../utils/wrapper");
 
@@ -65,12 +66,12 @@ const login = async (req, res) => {
 
     const jwt_secret = process.env.JWT_SECRET;
     const token = jwt.sign({ name: user.name, email: user.email }, jwt_secret, {
-      expiresIn: "24h",
+      expiresIn: JWT_EXPIRES_IN,
     });
 
     res.cookie("token", token, {
+      ...cookieConfig,
       maxAge: 24 * 60 * 60 * 1000,
-      path: "/",
     });
 
     return res.status(200).json(success(null, "User logged in"));
