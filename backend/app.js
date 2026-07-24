@@ -9,9 +9,9 @@ const auth = require("./routes/auth.route");
 // const projects = require("./routes/projects.route");
 // const tags = require("./routes/tags.route");
 // const reports = require("./routes/reports.route");
+const app = express();
 
 app.use(cookieParser());
-const app = express();
 app.use(express.json());
 
 const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS;
