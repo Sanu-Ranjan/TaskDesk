@@ -30,13 +30,13 @@ const signup = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
     const user = new User({ name, email, password: hashedPassword });
 
-    const { data, error: err } = await dbTask(() => user.save());
+    const { error: err } = await dbTask(() => user.save());
     if (err) {
-      console.log("Error adding new user", error);
+      console.log("Error adding new user", err);
       return dbError(res);
     }
 
-    return res.status(201).json(success(data, "user registered"));
+    return res.status(201).json(success(null, "user registered"));
   } catch (error) {
     console.log("Error at signup controller : ", error);
     return serverError(res);
@@ -103,7 +103,7 @@ const me = async (req, res) => {
 
 const logout = async (req, res) => {
   try {
-    res.clearCookie("token", { path: "/" });
+    res.clearCookie("token", cookieConfig);
     return res.status(200).json(success(null, "User logged out"));
   } catch (error) {
     console.log("Error at controller : logout ", error);
