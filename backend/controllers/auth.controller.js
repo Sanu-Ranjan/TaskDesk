@@ -78,9 +78,35 @@ const login = async (req, res) => {
   }
 };
 
-const me = async (req, res) => {};
+const me = async (req, res) => {
+  try {
+    const { data: user, error } = await dbTask(() =>
+      User.findOne({ email: req.user.email }).select("-password"),
+    );
+    if (error) {
+      console.log("Error finding user : ", error);
+      return dbError(res);
+    }
+    if (!user) {
+      return res.status(404).json(failure("User not found"));
+    }
 
-const logout = async (req, res) => {};
+    return res.status(200).json(success(user, "User fetched"));
+  } catch (error) {
+    console.log("Error at controller : me ", error);
+    return serverError(res);
+  }
+};
+
+const logout = async (req, res) => {
+  try {
+    res.clearCookie("token", { path: "/" });
+    return res.status(200).json(success(null, "User logged out"));
+  } catch (error) {
+    console.log("Error at controller : logout ", error);
+    return serverError(res);
+  }
+};
 
 function success(data, message = "Success") {
   return { success: true, message, data };

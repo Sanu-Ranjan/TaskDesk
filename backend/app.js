@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const cookieParser = require("cookie-parser");
 
 const { API_ROUTES } = require("./constants/apiRoutes");
 // const tasks = require("./routes/tasks.route");
@@ -9,6 +10,7 @@ const auth = require("./routes/auth.route");
 // const tags = require("./routes/tags.route");
 // const reports = require("./routes/reports.route");
 
+app.use(cookieParser());
 const app = express();
 app.use(express.json());
 
