@@ -3,6 +3,8 @@ const jwt = require("jsonwebtoken");
 
 const User = require("../models/User");
 const { SALT_ROUNDS } = require("../constants/index");
+const { dbError, failure, serverError, success } = require("../utils/res");
+const { dbTask } = require("../utils/wrapper");
 
 const signup = async (req, res) => {
   try {
@@ -107,31 +109,6 @@ const logout = async (req, res) => {
     return serverError(res);
   }
 };
-
-function success(data, message = "Success") {
-  return { success: true, message, data };
-}
-
-function failure(message, error = null) {
-  return { success: false, message, error };
-}
-
-function dbError(res) {
-  return res.status(500).json(failure("database operation failed"));
-}
-
-function serverError(res) {
-  return res.status(500).json(failure("Internal server error"));
-}
-
-async function dbTask(fn) {
-  try {
-    const result = await fn();
-    return { data: result, error: null };
-  } catch (err) {
-    return { data: null, error: err };
-  }
-}
 
 module.exports = {
   signup,
