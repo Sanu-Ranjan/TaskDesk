@@ -5,6 +5,12 @@ const ROUTE_END = {
     me: "/me",
     logout: "/logout",
   },
+  tasks: {
+    add: "/",
+    getAll: "/",
+    update: "/:id",
+    delete: "/:id",
+  },
 };
 
 module.exports = {
