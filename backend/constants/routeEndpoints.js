@@ -11,6 +11,13 @@ const ROUTE_END = {
     update: "/:id",
     delete: "/:id",
   },
+  teams: {
+    add: "/",
+    getAll: "/",
+    getOne: "/:id",
+    update: "/:id",
+    delete: "/:id",
+  },
 };
 
 module.exports = {
