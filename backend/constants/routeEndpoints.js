@@ -25,6 +25,15 @@ const ROUTE_END = {
     update: "/:id",
     delete: "/:id",
   },
+  tags: {
+    add: "/",
+    getAll: "/",
+  },
+  reports: {
+    lastWeek: "/last-week",
+    pending: "/pending",
+    closedTasks: "/closed-tasks",
+  },
 };
 
 module.exports = {
