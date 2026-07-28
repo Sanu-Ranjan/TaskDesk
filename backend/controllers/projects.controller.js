@@ -52,13 +52,97 @@ const getProjects = async (req, res) => {
   }
 };
 
-const getProject = async (req, res) => {};
+const getProject = async (req, res) => {
+  try {
+    const id = req.params;
+    const { data, error } = await dbTask(() => Project.findById(id));
+    if (error) {
+      console.log("Error fetching project : ", error);
+      return dbError(res);
+    }
+    if (!data) {
+      return res.status(404).json(failure("Project not found"));
+    }
 
-const updateProject = async (req, res) => {};
+    return res.status(200).json(success(data, "Project fetched"));
+  } catch (error) {
+    console.log("Error at controller : getProject ");
+    return serverError(res);
+  }
+};
 
-const deleteProject = async (req, res) => {};
+const updateProject = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, description } = request.body;
+
+    const { data: project, error: findErr } = await dbTask(() =>
+      Project.findById(id),
+    );
+    if (findErr) {
+      console.log("Error finding project : ", error);
+      dbError(res);
+    }
+
+    if (!project) {
+      return res.status(404).json(failure("Project not found"));
+    }
+
+    if (name !== undefined && name !== project.name) {
+      const { data: dup, error: dupErr } = await dbTask(() =>
+        Project.findOne({ name }),
+      );
+      if (dupErr) {
+        console.log("Error checking duplicate project : ", dupErr);
+        return dbError(res);
+      }
+      if (dup) {
+        return res.status(409).json(failure("Project name already exists"));
+      }
+      project.name = name;
+    }
+    if (description !== undefined) project.description = description;
+
+    const { data, error } = await dbTask(() => project.save());
+    if (error) {
+      console.log("Error updating project : ", error);
+      return dbError(res);
+    }
+
+    return res.status(200).json(success(data, "Project updated"));
+  } catch (error) {
+    console.log("Error at controller updateProject : ", error);
+    serverError(res);
+  }
+};
+
+const deleteProject = async (req, res) => {
+  try {
+    const { id } = request.params;
+
+    const { data: project, error: delError } = await dbTask(() =>
+      Project.findByIdAndDelete(id),
+    );
+    if (delError) {
+      console.log("Error finding Project : ", error);
+      dbError(res);
+    }
+
+    if (!project) {
+      return res.status(404).json(failure("Project not found"));
+    }
+
+    res.status(200).json(success(null, "Project deleted"));
+  } catch (error) {
+    console.log("Error at controller deleteProject : ", error);
+    serverError(res);
+  }
+};
 
 module.exports = {
   createProject,
   getProjects,
+  getProject,
+  updateProject,
+  deleteProject,
 };
