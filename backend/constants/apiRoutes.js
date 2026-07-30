@@ -1,11 +1,16 @@
+const BASE_PATH = "/api";
+const VERSION = "v1";
+
+const homePath = `${BASE_PATH}/${VERSION}`;
+
 const API_ROUTES = {
-  home: "/",
-  auth: "/auth",
-  tasks: "/tasks",
-  teams: "/teams",
-  projects: "/projects",
-  tags: "/tags",
-  reports: "/report",
+  home: `${homePath}`,
+  auth: `${homePath}/auth`,
+  tasks: `${homePath}/tasks`,
+  teams: `${homePath}/teams`,
+  projects: `${homePath}/projects`,
+  tags: `${homePath}/tags`,
+  reports: `${homePath}/report`,
 };
 
 module.exports = { API_ROUTES };

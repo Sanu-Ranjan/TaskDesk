@@ -10,6 +10,7 @@ const tags = require("./routes/tags.route");
 const reports = require("./routes/reports.route");
 const app = express();
 
+app.set("trust proxy", 1);
 app.use(cookieParser());
 app.use(express.json());
 

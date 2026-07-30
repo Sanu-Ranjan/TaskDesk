@@ -54,7 +54,7 @@ const getProjects = async (req, res) => {
 
 const getProject = async (req, res) => {
   try {
-    const id = req.params;
+    const { id } = req.params;
     const { data, error } = await dbTask(() => Project.findById(id));
     if (error) {
       console.log("Error fetching project : ", error);
@@ -74,7 +74,7 @@ const getProject = async (req, res) => {
 const updateProject = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, description } = request.body;
+    const { name, description } = req.body;
 
     const { data: project, error: findErr } = await dbTask(() =>
       Project.findById(id),
@@ -118,7 +118,7 @@ const updateProject = async (req, res) => {
 
 const deleteProject = async (req, res) => {
   try {
-    const { id } = request.params;
+    const { id } = req.params;
 
     const { data: project, error: delError } = await dbTask(() =>
       Project.findByIdAndDelete(id),
