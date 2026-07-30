@@ -9,7 +9,7 @@ const COOKIE = {
     httpOnly: true,
     secure: true,
     sameSite: "none",
-    domain: "taskdesk.mernlab.cloud",
+    domain: "taskdesk.mernlab.com",
     path: "/",
   }),
 };
