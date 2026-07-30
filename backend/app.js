@@ -26,7 +26,7 @@ app.use(API_ROUTES.tags, tags.router);
 app.use(API_ROUTES.reports, reports.router);
 
 app.use((req, res) => {
-  res.status(404).json(failure("Route not found"));
+  res.status(404).send("Route not found");
 });
 
 module.exports = { app };
