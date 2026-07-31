@@ -1,6 +1,7 @@
 const Project = require("../models/Project");
 const { dbError, failure, serverError, success } = require("../utils/res");
 const { dbTask } = require("../utils/wrapper");
+const { MAX_LIMIT } = require("../constants/pagination");
 
 const createProject = async (req, res) => {
   try {
@@ -37,15 +38,32 @@ const createProject = async (req, res) => {
 
 const getProjects = async (req, res) => {
   try {
-    const { data, error } = await dbTask(() =>
-      Project.find().sort({ createdAt: -1 }),
+    const limit = clampLimitPerPage(req.query.limit);
+    const { page, totalPages } = await clampPage(req.query.page, limit);
+    const skip = (page - 1) * limit;
+
+    const { data: projects, error } = await dbTask(() =>
+      Project.find().sort({ createdAt: -1 }).skip(skip).limit(limit),
     );
+
     if (error) {
       console.log("Error fetching projects : ", error);
       return dbError(res);
     }
 
-    return res.status(200).json(success(data, "Projects fetched"));
+    return res.status(200).json(
+      success(
+        {
+          projects,
+          pagination: {
+            page,
+            limit,
+            totalPages,
+          },
+        },
+        "Projects fetched",
+      ),
+    );
   } catch (error) {
     console.log("Error at controller : getProjects ", error);
     return serverError(res);
@@ -138,6 +156,21 @@ const deleteProject = async (req, res) => {
     serverError(res);
   }
 };
+
+async function clampPage(page, limit) {
+  const { data: count, error } = await dbTask(() => Project.countDocuments());
+  const totalPages = Math.ceil(count / limit);
+
+  page = Math.max(1, page || 1);
+  page = Math.min(totalPages, page);
+  return { page, totalPages };
+}
+
+function clampLimitPerPage(limit) {
+  limit = Math.max(1, limit || 1);
+  limit = Math.min(MAX_LIMIT.projects, limit);
+  return limit;
+}
 
 module.exports = {
   createProject,
