@@ -2,6 +2,7 @@ const Task = require("../models/Task");
 const { TASK_STATUS } = require("../constants");
 const { dbError, failure, serverError, success } = require("../utils/res");
 const { dbTask } = require("../utils/wrapper");
+const { MAX_LIMIT } = require("../constants/pagination");
 
 const POPULATE = [
   { path: "project", select: "name" },
@@ -66,6 +67,7 @@ const createTask = async (req, res) => {
 const getTasks = async (req, res) => {
   try {
     const { team, owner, tags, project, status } = req.query;
+    const limit = clampLimitPerPage(req.query.limit);
 
     const filter = {};
     if (team) filter.team = team;
@@ -77,20 +79,56 @@ const getTasks = async (req, res) => {
       filter.tags = { $in: tagList };
     }
 
-    const { data, error } = await dbTask(() =>
-      Task.find(filter).populate(POPULATE).sort({ createdAt: -1 }),
+    const { page, totalPages } = await clampPage(req.query.page, limit, filter);
+    const skip = (page - 1) * limit;
+
+    const { data: tasks, error } = await dbTask(() =>
+      Task.find(filter)
+        .populate(POPULATE)
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit),
     );
     if (error) {
       console.log("Error fetching tasks : ", error);
       return dbError(res);
     }
 
-    return res.status(200).json(success(data, "Tasks fetched"));
+    return res.status(200).json(
+      success(
+        {
+          tasks,
+          pagination: {
+            page,
+            limit,
+            totalPages,
+          },
+        },
+        "Tasks fetched",
+      ),
+    );
   } catch (error) {
     console.log("Error at controller : getTasks ", error);
     return serverError(res);
   }
 };
+
+async function clampPage(page, limit, filter = {}) {
+  const { data: count, error } = await dbTask(() =>
+    Task.countDocuments(filter),
+  );
+  const totalPages = Math.ceil(count / limit);
+
+  page = Math.max(1, page || 1);
+  page = Math.min(totalPages, page);
+  return { page, totalPages };
+}
+
+function clampLimitPerPage(limit) {
+  limit = Math.max(1, limit || 1);
+  limit = Math.min(MAX_LIMIT.tasks, limit);
+  return limit;
+}
 
 const updateTask = async (req, res) => {
   try {

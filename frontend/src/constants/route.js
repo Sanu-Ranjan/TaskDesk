@@ -3,4 +3,9 @@ export const ROUTES = {
   LOGIN: "/login",
   SIGNUP: "/signup",
   PROFILE: "/profile",
+  DASHBOARD: "/dashboard",
+  PROJECT: "/project",
+  TEAM: "/team",
+  REPORTS: "/reports",
+  SETTINGS: "/settings",
 };
