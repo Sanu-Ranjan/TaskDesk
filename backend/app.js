@@ -8,6 +8,7 @@ const teams = require("./routes/teams.route");
 const projects = require("./routes/projects.route");
 const tags = require("./routes/tags.route");
 const reports = require("./routes/reports.route");
+const users = require("./routes/users.route");
 const app = express();
 
 app.set("trust proxy", 1);
@@ -24,6 +25,7 @@ app.use(API_ROUTES.teams, teams.router);
 app.use(API_ROUTES.projects, projects.router);
 app.use(API_ROUTES.tags, tags.router);
 app.use(API_ROUTES.reports, reports.router);
+app.use(API_ROUTES.users, users.router);
 
 app.use((req, res) => {
   res.status(404).send("Route not found");

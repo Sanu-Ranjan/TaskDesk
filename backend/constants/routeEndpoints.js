@@ -17,6 +17,11 @@ const ROUTE_END = {
     getOne: "/:id",
     update: "/:id",
     delete: "/:id",
+    addMember: "/:id/members",
+    removeMember: "/:id/members/:userId",
+  },
+  users: {
+    getAll: "/",
   },
   projects: {
     add: "/",

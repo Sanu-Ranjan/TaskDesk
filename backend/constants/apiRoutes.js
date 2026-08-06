@@ -11,6 +11,7 @@ const API_ROUTES = {
   projects: `${homePath}/projects`,
   tags: `${homePath}/tags`,
   reports: `${homePath}/report`,
+  users: `${homePath}/users`,
 };
 
 module.exports = { API_ROUTES };

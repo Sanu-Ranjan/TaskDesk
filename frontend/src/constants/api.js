@@ -13,4 +13,16 @@ export const API_ENDPOINTS = {
   TASKS: {
     BASE: `${API_BASE}/tasks`,
   },
+  TEAM: {
+    CREATE_TEAM: `${API_BASE}/teams`,
+    GET_TEAMS: `${API_BASE}/teams`,
+    GET_TEAM_BY_ID: (id) => `${API_BASE}/teams/${id}`,
+    UPDATE_TEAM: (id) => `${API_BASE}/teams/${id}`,
+    DELETE_TEAM: (id) => `${API_BASE}/teams/${id}`,
+    ADD_MEMBER: (id) => `${API_BASE}/teams/${id}/members`,
+    REMOVE_MEMBER: (id, userId) => `${API_BASE}/teams/${id}/members/${userId}`,
+  },
+  USERS: {
+    GET_ALL: `${API_BASE}/users`,
+  },
 };

@@ -6,6 +6,7 @@ export const ROUTES = {
   DASHBOARD: "/dashboard",
   PROJECT: "/project",
   TEAM: "/team",
+  TEAM_DETAIL: "/team/:id",
   REPORTS: "/reports",
   SETTINGS: "/settings",
 };

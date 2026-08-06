@@ -6,6 +6,8 @@ const {
   getTeam,
   updateTeam,
   deleteTeam,
+  addMember,
+  removeMember,
 } = require("../controllers/teams.controller");
 const { ROUTE_END } = require("../constants/routeEndpoints");
 const { authenticate } = require("../middlewares/authenticate");
@@ -17,6 +19,8 @@ router.get(ROUTE_END.teams.getAll, getTeams);
 router.get(ROUTE_END.teams.getOne, getTeam);
 router.post(ROUTE_END.teams.update, updateTeam);
 router.delete(ROUTE_END.teams.delete, deleteTeam);
+router.post(ROUTE_END.teams.addMember, addMember);
+router.delete(ROUTE_END.teams.removeMember, removeMember);
 
 module.exports = {
   router,
