@@ -1,5 +1,5 @@
 const Task = require("../models/Task");
-const { TASK_STATUS } = require("../constants");
+const { TASK_STATUS, TASK_PRIORITY } = require("../constants");
 const { dbError, failure, serverError, success } = require("../utils/res");
 const { dbTask } = require("../utils/wrapper");
 const { MAX_LIMIT } = require("../constants/pagination");
@@ -10,17 +10,47 @@ const POPULATE = [
   { path: "owners", select: "name email" },
 ];
 
+// map priority -> numeric rank for ordered sorting
+const PRIORITY_RANK = TASK_PRIORITY.reduce((acc, p, i) => {
+  acc[p] = i;
+  return acc;
+}, {});
+
+// supported sort keys -> mongo sort spec (priority handled separately)
+const SORT_OPTIONS = {
+  newest: { createdAt: -1 },
+  oldest: { createdAt: 1 },
+  priorityLowHigh: "priorityAsc",
+  priorityHighLow: "priorityDesc",
+};
+
 const createTask = async (req, res) => {
   try {
-    const { name, project, team, owners, tags, timeToComplete, status } =
-      req.body;
+    const {
+      name,
+      project,
+      team,
+      owners,
+      tags,
+      timeToComplete,
+      dueDate,
+      priority,
+      status,
+    } = req.body;
 
-    if (!name || !project || !team || !owners || timeToComplete == null) {
+    if (
+      !name ||
+      !project ||
+      !team ||
+      !owners ||
+      timeToComplete == null ||
+      !dueDate
+    ) {
       return res
         .status(400)
         .json(
           failure(
-            "name, project, team, owners and timeToComplete are required",
+            "name, project, team, owners, timeToComplete and dueDate are required",
           ),
         );
     }
@@ -33,6 +63,10 @@ const createTask = async (req, res) => {
       return res.status(400).json(failure("Invalid status value"));
     }
 
+    if (priority && !TASK_PRIORITY.includes(priority)) {
+      return res.status(400).json(failure("Invalid priority value"));
+    }
+
     const task = new Task({
       name,
       project,
@@ -40,6 +74,8 @@ const createTask = async (req, res) => {
       owners,
       tags,
       timeToComplete,
+      dueDate,
+      ...(priority && { priority }),
       ...(status && { status }),
     });
 
@@ -66,7 +102,7 @@ const createTask = async (req, res) => {
 
 const getTasks = async (req, res) => {
   try {
-    const { team, owner, tags, project, status } = req.query;
+    const { team, owner, tags, project, status, sort } = req.query;
     const limit = clampLimitPerPage(req.query.limit);
 
     const filter = {};
@@ -82,13 +118,40 @@ const getTasks = async (req, res) => {
     const { page, totalPages } = await clampPage(req.query.page, limit, filter);
     const skip = (page - 1) * limit;
 
-    const { data: tasks, error } = await dbTask(() =>
-      Task.find(filter)
+    const sortSpec = SORT_OPTIONS[sort] || SORT_OPTIONS.newest;
+    const isPrioritySort =
+      sortSpec === "priorityAsc" || sortSpec === "priorityDesc";
+
+    let query;
+    if (isPrioritySort) {
+      // enum strings don't sort by rank, so compute a numeric rank
+      const dir = sortSpec === "priorityAsc" ? 1 : -1;
+      const branches = TASK_PRIORITY.map((p) => ({
+        case: { $eq: ["$priority", p] },
+        then: PRIORITY_RANK[p],
+      }));
+      query = Task.aggregate([
+        { $match: filter },
+        {
+          $addFields: {
+            _priorityRank: {
+              $switch: { branches, default: PRIORITY_RANK.Medium },
+            },
+          },
+        },
+        { $sort: { _priorityRank: dir, createdAt: -1 } },
+        { $skip: skip },
+        { $limit: limit },
+      ]).then((docs) => Task.populate(docs, POPULATE));
+    } else {
+      query = Task.find(filter)
         .populate(POPULATE)
-        .sort({ createdAt: -1 })
+        .sort(sortSpec)
         .skip(skip)
-        .limit(limit),
-    );
+        .limit(limit);
+    }
+
+    const { data: tasks, error } = await dbTask(() => query);
     if (error) {
       console.log("Error fetching tasks : ", error);
       return dbError(res);
@@ -133,11 +196,24 @@ function clampLimitPerPage(limit) {
 const updateTask = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, project, team, owners, tags, timeToComplete, status } =
-      req.body;
+    const {
+      name,
+      project,
+      team,
+      owners,
+      tags,
+      timeToComplete,
+      dueDate,
+      priority,
+      status,
+    } = req.body;
 
     if (status && !TASK_STATUS.includes(status)) {
       return res.status(400).json(failure("Invalid status value"));
+    }
+
+    if (priority && !TASK_PRIORITY.includes(priority)) {
+      return res.status(400).json(failure("Invalid priority value"));
     }
 
     if (owners && (!Array.isArray(owners) || owners.length === 0)) {
@@ -161,6 +237,8 @@ const updateTask = async (req, res) => {
     if (owners !== undefined) task.owners = owners;
     if (tags !== undefined) task.tags = tags;
     if (timeToComplete !== undefined) task.timeToComplete = timeToComplete;
+    if (dueDate !== undefined) task.dueDate = dueDate;
+    if (priority !== undefined) task.priority = priority;
     if (status !== undefined) task.status = status;
 
     const { data, error } = await dbTask(() =>
