@@ -12,6 +12,7 @@ import Profile from "./pages/Profile";
 import Dashboard from "./pages/Dashboard";
 import Teams from "./pages/Teams";
 import TeamDetail from "./pages/TeamDetail";
+import ProjectDetail from "./pages/ProjectDetail";
 import { ROUTES } from "./constants/route";
 
 const router = createBrowserRouter([
@@ -56,6 +57,14 @@ const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <TeamDetail />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: ROUTES.PROJECT_DETAIL,
+    element: (
+      <ProtectedRoute>
+        <ProjectDetail />
       </ProtectedRoute>
     ),
   },

@@ -9,9 +9,11 @@ export const API_ENDPOINTS = {
   },
   PROJECTS: {
     BASE: `${API_BASE}/projects`,
+    GET_BY_ID: (id) => `${API_BASE}/projects/${id}`,
   },
   TASKS: {
     BASE: `${API_BASE}/tasks`,
+    BY_ID: (id) => `${API_BASE}/tasks/${id}`,
   },
   TEAM: {
     CREATE_TEAM: `${API_BASE}/teams`,
@@ -21,6 +23,9 @@ export const API_ENDPOINTS = {
     DELETE_TEAM: (id) => `${API_BASE}/teams/${id}`,
     ADD_MEMBER: (id) => `${API_BASE}/teams/${id}/members`,
     REMOVE_MEMBER: (id, userId) => `${API_BASE}/teams/${id}/members/${userId}`,
+  },
+  TAGS: {
+    BASE: `${API_BASE}/tags`,
   },
   USERS: {
     GET_ALL: `${API_BASE}/users`,
