@@ -30,4 +30,9 @@ export const API_ENDPOINTS = {
   USERS: {
     GET_ALL: `${API_BASE}/users`,
   },
+  REPORTS: {
+    LAST_WEEK: `${API_BASE}/report/last-week`,
+    PENDING: `${API_BASE}/report/pending`,
+    CLOSED_TASKS: `${API_BASE}/report/closed-tasks`,
+  },
 };

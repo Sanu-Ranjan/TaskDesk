@@ -59,16 +59,46 @@ const pending = async (req, res) => {
       return dbError(res);
     }
 
+    // per-project pending days for the bar chart
+    const { data: byProject, error: bpErr } = await dbTask(() =>
+      Task.aggregate([
+        { $match: { status: { $ne: COMPLETED } } },
+        {
+          $group: {
+            _id: "$project",
+            totalDays: { $sum: "$timeToComplete" },
+          },
+        },
+        {
+          $lookup: {
+            from: "projects",
+            localField: "_id",
+            foreignField: "_id",
+            as: "info",
+          },
+        },
+        { $unwind: "$info" },
+        { $project: { _id: 1, name: "$info.name", totalDays: 1 } },
+        { $sort: { totalDays: -1 } },
+      ]),
+    );
+    if (bpErr) {
+      console.log("Error fetching pending-by-project : ", bpErr);
+      return dbError(res);
+    }
+
     const result = data[0] || { totalDays: 0, taskCount: 0 };
 
-    return res
-      .status(200)
-      .json(
-        success(
-          { totalDays: result.totalDays, taskCount: result.taskCount },
-          "Total days of work pending",
-        ),
-      );
+    return res.status(200).json(
+      success(
+        {
+          totalDays: result.totalDays,
+          taskCount: result.taskCount,
+          byProject,
+        },
+        "Total days of work pending",
+      ),
+    );
   } catch (error) {
     console.log("Error at controller : pending ", error);
     return serverError(res);
