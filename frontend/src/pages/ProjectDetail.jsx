@@ -1,5 +1,10 @@
 import { useEffect, useState, useCallback } from "react";
-import { useParams, useSearchParams, Link } from "react-router-dom";
+import {
+  useParams,
+  useSearchParams,
+  useNavigate,
+  Link,
+} from "react-router-dom";
 
 import Navigation from "../components/Navigation";
 import TaskFormModal from "../components/TaskFormModal";
@@ -26,6 +31,7 @@ const PRIORITY_BADGE = {
 
 function ProjectDetail() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const [project, setProject] = useState(null);
@@ -230,7 +236,13 @@ function ProjectDetail() {
                   </thead>
                   <tbody>
                     {tasks.map((t) => (
-                      <tr key={t._id}>
+                      <tr
+                        key={t._id}
+                        role="button"
+                        onClick={() =>
+                          navigate(ROUTES.TASK_DETAIL.replace(":id", t._id))
+                        }
+                      >
                         <td className="fw-medium">{t.name}</td>
                         <td>
                           {(t.owners || []).map((o) => o.name).join(", ") ||

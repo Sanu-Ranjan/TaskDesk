@@ -13,6 +13,7 @@ import Dashboard from "./pages/Dashboard";
 import Teams from "./pages/Teams";
 import TeamDetail from "./pages/TeamDetail";
 import ProjectDetail from "./pages/ProjectDetail";
+import TaskDetail from "./pages/TaskDetail";
 import Projects from "./pages/Projects";
 import Reports from "./pages/Reports";
 import { ROUTES } from "./constants/route";
@@ -75,6 +76,14 @@ const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <ProjectDetail />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: ROUTES.TASK_DETAIL,
+    element: (
+      <ProtectedRoute>
+        <TaskDetail />
       </ProtectedRoute>
     ),
   },

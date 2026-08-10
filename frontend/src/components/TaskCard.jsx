@@ -1,3 +1,7 @@
+import { useNavigate } from "react-router-dom";
+
+import { ROUTES } from "../constants/route";
+
 const STATUS_STYLES = {
   "To Do": "bg-secondary-subtle text-secondary-emphasis",
   "In Progress": "bg-warning-subtle text-warning-emphasis",
@@ -10,9 +14,14 @@ function TaskCard({ task }) {
     STATUS_STYLES[task.status] || "bg-secondary-subtle text-secondary-emphasis";
 
   const owners = task.owners || [];
+  const navigate = useNavigate();
 
   return (
-    <div className="card h-100 shadow-sm">
+    <div
+      className="card h-100 shadow-sm"
+      role="button"
+      onClick={() => navigate(ROUTES.TASK_DETAIL.replace(":id", task._id))}
+    >
       <div className="card-body">
         <span className={`badge rounded-pill mb-2 ${statusClass}`}>
           {task.status}

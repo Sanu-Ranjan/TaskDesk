@@ -193,6 +193,28 @@ function clampLimitPerPage(limit) {
   return limit;
 }
 
+const getTask = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const { data, error } = await dbTask(() =>
+      Task.findById(id).populate(POPULATE),
+    );
+    if (error) {
+      console.log("Error fetching task : ", error);
+      return dbError(res);
+    }
+    if (!data) {
+      return res.status(404).json(failure("Task not found"));
+    }
+
+    return res.status(200).json(success(data, "Task fetched"));
+  } catch (error) {
+    console.log("Error at controller : getTask ", error);
+    return serverError(res);
+  }
+};
+
 const updateTask = async (req, res) => {
   try {
     const { id } = req.params;
@@ -279,6 +301,7 @@ const deleteTask = async (req, res) => {
 module.exports = {
   createTask,
   getTasks,
+  getTask,
   updateTask,
   deleteTask,
 };

@@ -8,6 +8,7 @@ const ROUTE_END = {
   tasks: {
     add: "/",
     getAll: "/",
+    getOne: "/:id",
     update: "/:id",
     delete: "/:id",
   },

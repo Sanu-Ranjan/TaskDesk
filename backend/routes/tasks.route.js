@@ -3,6 +3,7 @@ const router = require("express").Router();
 const {
   createTask,
   getTasks,
+  getTask,
   updateTask,
   deleteTask,
 } = require("../controllers/tasks.controller");
@@ -13,6 +14,7 @@ router.use(authenticate);
 
 router.post(ROUTE_END.tasks.add, createTask);
 router.get(ROUTE_END.tasks.getAll, getTasks);
+router.get(ROUTE_END.tasks.getOne, getTask);
 router.post(ROUTE_END.tasks.update, updateTask);
 router.delete(ROUTE_END.tasks.delete, deleteTask);
 
