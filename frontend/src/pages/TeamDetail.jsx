@@ -3,6 +3,7 @@ import { useParams, Link } from "react-router-dom";
 
 import Navigation from "../components/Navigation";
 import Modal from "../components/Modal";
+import TeamTasks from "../components/TeamTasks";
 import { apiGet, apiPost, apiDelete } from "../utils/api";
 import { API_ENDPOINTS } from "../constants/api";
 import { ROUTES } from "../constants/route";
@@ -104,6 +105,8 @@ function TeamDetail() {
                 ))}
               </ul>
             )}
+
+            <TeamTasks teamId={id} />
           </>
         )}
       </main>
