@@ -40,6 +40,14 @@ const router = createBrowserRouter([
     ),
   },
   {
+    path: ROUTES.SETTINGS,
+    element: (
+      <ProtectedRoute>
+        <Profile />
+      </ProtectedRoute>
+    ),
+  },
+  {
     path: ROUTES.DASHBOARD,
     element: (
       <ProtectedRoute>

@@ -1,5 +1,7 @@
 import { useNavigate } from "react-router-dom";
 
+import Navigation from "../components/Navigation";
+import TopBar from "../components/TopBar";
 import { useAuth } from "../contexts/AuthContext";
 import { ROUTES } from "../constants/route";
 
@@ -13,21 +15,44 @@ function Profile() {
   }
 
   return (
-    <div style={{ maxWidth: 420, margin: "60px auto", fontFamily: "system-ui" }}>
-      <h2>Profile</h2>
+    <div className="d-flex">
+      <Navigation />
 
-      <p>
-        <strong>Name:</strong> {user?.name}
-      </p>
-      <p>
-        <strong>Email:</strong> {user?.email}
-      </p>
+      <div className="flex-grow-1 d-flex flex-column" style={{ minWidth: 0 }}>
+        <TopBar />
+        <main className="flex-grow-1 p-4 bg-light" style={{ minWidth: 0 }}>
+          <h4 className="fw-bold mb-4">Settings</h4>
 
-      <button onClick={handleLogout}>Log out</button>
+          <div className="card shadow-sm" style={{ maxWidth: 480 }}>
+            <div className="card-body">
+              <div className="d-flex align-items-center gap-3 mb-4">
+                <span
+                  className="badge rounded-circle bg-primary fs-5"
+                  style={{ width: 56, height: 56, lineHeight: "44px" }}
+                >
+                  {user?.name?.[0]?.toUpperCase()}
+                </span>
+                <div>
+                  <div className="fw-bold fs-5">{user?.name}</div>
+                  <div className="text-muted">{user?.email}</div>
+                </div>
+              </div>
 
-      <pre style={{ background: "#f4f4f4", padding: 12, marginTop: 24 }}>
-        {JSON.stringify(user, null, 2)}
-      </pre>
+              <dl className="row mb-4">
+                <dt className="col-sm-4 text-muted">Name</dt>
+                <dd className="col-sm-8">{user?.name}</dd>
+
+                <dt className="col-sm-4 text-muted">Email</dt>
+                <dd className="col-sm-8">{user?.email}</dd>
+              </dl>
+
+              <button className="btn btn-outline-danger" onClick={handleLogout}>
+                Log out
+              </button>
+            </div>
+          </div>
+        </main>
+      </div>
     </div>
   );
 }
