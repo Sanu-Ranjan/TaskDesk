@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
 
-import Navigation from "../components/Navigation";
+import AppLayout from "../components/AppLayout";
 import Modal from "../components/Modal";
 import TeamTasks from "../components/TeamTasks";
 import { apiGet, apiPost, apiDelete } from "../utils/api";
@@ -43,73 +43,64 @@ function TeamDetail() {
   }
 
   return (
-    <div className="d-flex">
-      <Navigation />
+    <AppLayout>
+      <Link to={ROUTES.TEAM} className="text-decoration-none small">
+        &larr; Back to Teams
+      </Link>
 
-      <main
-        className="flex-grow-1 p-4 bg-light"
-        style={{ minHeight: "100vh", minWidth: 0 }}
-      >
-        <Link to={ROUTES.TEAM} className="text-decoration-none small">
-          &larr; Back to Teams
-        </Link>
+      {loading && <p className="text-muted mt-3">Loading team...</p>}
+      {error && <p className="text-danger mt-3">Error: {error}</p>}
 
-        {loading && <p className="text-muted mt-3">Loading team...</p>}
-        {error && <p className="text-danger mt-3">Error: {error}</p>}
+      {!loading && !error && team && (
+        <>
+          <div className="d-flex align-items-center justify-content-between mt-3 mb-1">
+            <h4 className="fw-bold mb-0">{team.name}</h4>
+            <button
+              className="btn btn-primary btn-sm"
+              onClick={() => setShowAdd(true)}
+            >
+              + Member
+            </button>
+          </div>
+          <p className="text-muted">{team.description}</p>
 
-        {!loading && !error && team && (
-          <>
-            <div className="d-flex align-items-center justify-content-between mt-3 mb-1">
-              <h4 className="fw-bold mb-0">{team.name}</h4>
-              <button
-                className="btn btn-primary btn-sm"
-                onClick={() => setShowAdd(true)}
-              >
-                + Member
-              </button>
-            </div>
-            <p className="text-muted">{team.description}</p>
+          <h6 className="text-uppercase text-muted small mt-4 mb-3">Members</h6>
 
-            <h6 className="text-uppercase text-muted small mt-4 mb-3">
-              Members
-            </h6>
-
-            {(team.members || []).length === 0 ? (
-              <p className="text-muted">No members yet.</p>
-            ) : (
-              <ul className="list-group" style={{ maxWidth: 480 }}>
-                {team.members.map((m) => (
-                  <li
-                    key={m._id}
-                    className="list-group-item d-flex align-items-center justify-content-between"
-                  >
-                    <span className="d-flex align-items-center gap-2">
-                      <span
-                        className="badge rounded-circle bg-secondary"
-                        style={{ width: 32, height: 32, lineHeight: "24px" }}
-                      >
-                        {m.name?.[0]?.toUpperCase()}
-                      </span>
-                      <span>
-                        {m.name}
-                        <span className="text-muted small ms-2">{m.email}</span>
-                      </span>
-                    </span>
-                    <button
-                      className="btn btn-sm btn-outline-danger"
-                      onClick={() => handleRemove(m._id)}
+          {(team.members || []).length === 0 ? (
+            <p className="text-muted">No members yet.</p>
+          ) : (
+            <ul className="list-group" style={{ maxWidth: 480 }}>
+              {team.members.map((m) => (
+                <li
+                  key={m._id}
+                  className="list-group-item d-flex align-items-center justify-content-between"
+                >
+                  <span className="d-flex align-items-center gap-2">
+                    <span
+                      className="badge rounded-circle bg-secondary"
+                      style={{ width: 32, height: 32, lineHeight: "24px" }}
                     >
-                      Remove
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
+                      {m.name?.[0]?.toUpperCase()}
+                    </span>
+                    <span>
+                      {m.name}
+                      <span className="text-muted small ms-2">{m.email}</span>
+                    </span>
+                  </span>
+                  <button
+                    className="btn btn-sm btn-outline-danger"
+                    onClick={() => handleRemove(m._id)}
+                  >
+                    Remove
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
 
-            <TeamTasks teamId={id} />
-          </>
-        )}
-      </main>
+          <TeamTasks teamId={id} />
+        </>
+      )}
 
       {showAdd && team && (
         <AddMemberModal
@@ -122,7 +113,7 @@ function TeamDetail() {
           }}
         />
       )}
-    </div>
+    </AppLayout>
   );
 }
 

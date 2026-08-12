@@ -11,7 +11,7 @@ import {
 } from "chart.js";
 import { Bar, Pie } from "react-chartjs-2";
 
-import Navigation from "../components/Navigation";
+import AppLayout from "../components/AppLayout";
 import { apiGet } from "../utils/api";
 import { API_ENDPOINTS } from "../constants/api";
 
@@ -140,92 +140,85 @@ function Reports() {
   };
 
   return (
-    <div className="d-flex">
-      <Navigation />
+    <AppLayout>
+      <h4 className="fw-bold mb-4">Reports</h4>
 
-      <main
-        className="flex-grow-1 p-4 bg-light"
-        style={{ minHeight: "100vh", minWidth: 0 }}
-      >
-        <h4 className="fw-bold mb-4">Reports</h4>
+      {error && <p className="text-danger">Error: {error}</p>}
+      {loading && <p className="text-muted">Loading reports...</p>}
 
-        {error && <p className="text-danger">Error: {error}</p>}
-        {loading && <p className="text-muted">Loading reports...</p>}
-
-        {!loading && (
-          <>
-            {/* summary stats */}
-            <div className="row g-3 mb-4">
-              <div className="col-6 col-lg-3">
-                <div className="card shadow-sm h-100">
-                  <div className="card-body">
-                    <div className="text-muted small">Completed last week</div>
-                    <div className="fs-3 fw-bold">
-                      {lastWeek ? lastWeek.count : 0}
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="col-6 col-lg-3">
-                <div className="card shadow-sm h-100">
-                  <div className="card-body">
-                    <div className="text-muted small">Pending work (days)</div>
-                    <div className="fs-3 fw-bold">
-                      {pending ? pending.totalDays : 0}
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="col-6 col-lg-3">
-                <div className="card shadow-sm h-100">
-                  <div className="card-body">
-                    <div className="text-muted small">Pending tasks</div>
-                    <div className="fs-3 fw-bold">
-                      {pending ? pending.taskCount : 0}
-                    </div>
+      {!loading && (
+        <>
+          {/* summary stats */}
+          <div className="row g-3 mb-4">
+            <div className="col-6 col-lg-3">
+              <div className="card shadow-sm h-100">
+                <div className="card-body">
+                  <div className="text-muted small">Completed last week</div>
+                  <div className="fs-3 fw-bold">
+                    {lastWeek ? lastWeek.count : 0}
                   </div>
                 </div>
               </div>
             </div>
-
-            {/* four chart panels, matching the reports screen */}
-            <div className="row g-4">
-              <ChartCard
-                title="Total Work Done Last Week"
-                empty={Object.keys(lastWeekByTeam).length === 0}
-              >
-                <Bar data={lastWeekBar} options={BAR_OPTIONS} />
-              </ChartCard>
-
-              <ChartCard
-                title="Total Days of Work Pending"
-                empty={pendingByProject.length === 0}
-              >
-                <Bar data={pendingBar} options={BAR_OPTIONS} />
-              </ChartCard>
-
-              <ChartCard
-                title="Tasks Closed by Team"
-                empty={closedByTeam.length === 0}
-              >
-                <div style={{ maxWidth: 340, margin: "0 auto" }}>
-                  <Pie data={teamPie} options={{ responsive: true }} />
+            <div className="col-6 col-lg-3">
+              <div className="card shadow-sm h-100">
+                <div className="card-body">
+                  <div className="text-muted small">Pending work (days)</div>
+                  <div className="fs-3 fw-bold">
+                    {pending ? pending.totalDays : 0}
+                  </div>
                 </div>
-              </ChartCard>
-
-              <ChartCard
-                title="Tasks Closed by Owner"
-                empty={closedByOwner.length === 0}
-              >
-                <div style={{ maxWidth: 340, margin: "0 auto" }}>
-                  <Pie data={ownerPie} options={{ responsive: true }} />
-                </div>
-              </ChartCard>
+              </div>
             </div>
-          </>
-        )}
-      </main>
-    </div>
+            <div className="col-6 col-lg-3">
+              <div className="card shadow-sm h-100">
+                <div className="card-body">
+                  <div className="text-muted small">Pending tasks</div>
+                  <div className="fs-3 fw-bold">
+                    {pending ? pending.taskCount : 0}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* four chart panels, matching the reports screen */}
+          <div className="row g-4">
+            <ChartCard
+              title="Total Work Done Last Week"
+              empty={Object.keys(lastWeekByTeam).length === 0}
+            >
+              <Bar data={lastWeekBar} options={BAR_OPTIONS} />
+            </ChartCard>
+
+            <ChartCard
+              title="Total Days of Work Pending"
+              empty={pendingByProject.length === 0}
+            >
+              <Bar data={pendingBar} options={BAR_OPTIONS} />
+            </ChartCard>
+
+            <ChartCard
+              title="Tasks Closed by Team"
+              empty={closedByTeam.length === 0}
+            >
+              <div style={{ maxWidth: 340, margin: "0 auto" }}>
+                <Pie data={teamPie} options={{ responsive: true }} />
+              </div>
+            </ChartCard>
+
+            <ChartCard
+              title="Tasks Closed by Owner"
+              empty={closedByOwner.length === 0}
+            >
+              <div style={{ maxWidth: 340, margin: "0 auto" }}>
+                <Pie data={ownerPie} options={{ responsive: true }} />
+              </div>
+            </ChartCard>
+          </div>
+        </>
+      )}
+    </AppLayout>
   );
 }
 

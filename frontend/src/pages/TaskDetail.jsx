@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 
-import Navigation from "../components/Navigation";
+import AppLayout from "../components/AppLayout";
 import TaskFormModal from "../components/TaskFormModal";
 import Modal from "../components/Modal";
 import { apiGet, apiPost, apiDelete } from "../utils/api";
@@ -84,124 +84,114 @@ function TaskDetail() {
   }
 
   return (
-    <div className="d-flex">
-      <Navigation />
-
-      <main
-        className="flex-grow-1 p-4 bg-light"
-        style={{ minHeight: "100vh", minWidth: 0 }}
+    <AppLayout>
+      <button
+        className="btn btn-link text-decoration-none p-0 small"
+        onClick={() => navigate(-1)}
       >
-        <button
-          className="btn btn-link text-decoration-none p-0 small"
-          onClick={() => navigate(-1)}
-        >
-          &larr; Back
-        </button>
+        &larr; Back
+      </button>
 
-        {loading && <p className="text-muted mt-3">Loading task...</p>}
-        {error && <p className="text-danger mt-3">Error: {error}</p>}
+      {loading && <p className="text-muted mt-3">Loading task...</p>}
+      {error && <p className="text-danger mt-3">Error: {error}</p>}
 
-        {!loading && task && (
-          <div className="card shadow-sm mt-3" style={{ maxWidth: 640 }}>
-            <div className="card-body">
-              <div className="d-flex justify-content-between align-items-start mb-3">
-                <h4 className="fw-bold mb-0">{task.name}</h4>
+      {!loading && task && (
+        <div className="card shadow-sm mt-3" style={{ maxWidth: 640 }}>
+          <div className="card-body">
+            <div className="d-flex justify-content-between align-items-start mb-3">
+              <h4 className="fw-bold mb-0">{task.name}</h4>
+              <span
+                className={`badge ${
+                  STATUS_BADGE[task.status] ||
+                  "bg-secondary-subtle text-secondary-emphasis"
+                }`}
+              >
+                {task.status}
+              </span>
+            </div>
+
+            <dl className="row mb-0">
+              <dt className="col-sm-3 text-muted">Project</dt>
+              <dd className="col-sm-9">
+                {task.project?.name ? (
+                  <Link
+                    to={ROUTES.PROJECT_DETAIL.replace(":id", task.project._id)}
+                  >
+                    {task.project.name}
+                  </Link>
+                ) : (
+                  "-"
+                )}
+              </dd>
+
+              <dt className="col-sm-3 text-muted">Team</dt>
+              <dd className="col-sm-9">{task.team?.name || "-"}</dd>
+
+              <dt className="col-sm-3 text-muted">Owners</dt>
+              <dd className="col-sm-9">
+                {(task.owners || []).map((o) => o.name).join(", ") || "-"}
+              </dd>
+
+              <dt className="col-sm-3 text-muted">Tags</dt>
+              <dd className="col-sm-9">
+                {(task.tags || []).length > 0
+                  ? task.tags.map((t) => (
+                      <span
+                        key={t}
+                        className="badge bg-primary-subtle text-primary-emphasis me-1"
+                      >
+                        {t}
+                      </span>
+                    ))
+                  : "-"}
+              </dd>
+
+              <dt className="col-sm-3 text-muted">Priority</dt>
+              <dd className="col-sm-9">
                 <span
                   className={`badge ${
-                    STATUS_BADGE[task.status] ||
-                    "bg-secondary-subtle text-secondary-emphasis"
+                    PRIORITY_BADGE[task.priority] || "bg-light text-dark"
                   }`}
                 >
-                  {task.status}
+                  {task.priority}
                 </span>
-              </div>
+              </dd>
 
-              <dl className="row mb-0">
-                <dt className="col-sm-3 text-muted">Project</dt>
-                <dd className="col-sm-9">
-                  {task.project?.name ? (
-                    <Link
-                      to={ROUTES.PROJECT_DETAIL.replace(
-                        ":id",
-                        task.project._id,
-                      )}
-                    >
-                      {task.project.name}
-                    </Link>
-                  ) : (
-                    "-"
-                  )}
-                </dd>
+              <dt className="col-sm-3 text-muted">Due Date</dt>
+              <dd className="col-sm-9">{fmtDate(task.dueDate)}</dd>
 
-                <dt className="col-sm-3 text-muted">Team</dt>
-                <dd className="col-sm-9">{task.team?.name || "-"}</dd>
+              <dt className="col-sm-3 text-muted">Time to Complete</dt>
+              <dd className="col-sm-9">{task.timeToComplete} day(s)</dd>
+            </dl>
 
-                <dt className="col-sm-3 text-muted">Owners</dt>
-                <dd className="col-sm-9">
-                  {(task.owners || []).map((o) => o.name).join(", ") || "-"}
-                </dd>
+            <hr />
 
-                <dt className="col-sm-3 text-muted">Tags</dt>
-                <dd className="col-sm-9">
-                  {(task.tags || []).length > 0
-                    ? task.tags.map((t) => (
-                        <span
-                          key={t}
-                          className="badge bg-primary-subtle text-primary-emphasis me-1"
-                        >
-                          {t}
-                        </span>
-                      ))
-                    : "-"}
-                </dd>
-
-                <dt className="col-sm-3 text-muted">Priority</dt>
-                <dd className="col-sm-9">
-                  <span
-                    className={`badge ${
-                      PRIORITY_BADGE[task.priority] || "bg-light text-dark"
-                    }`}
-                  >
-                    {task.priority}
-                  </span>
-                </dd>
-
-                <dt className="col-sm-3 text-muted">Due Date</dt>
-                <dd className="col-sm-9">{fmtDate(task.dueDate)}</dd>
-
-                <dt className="col-sm-3 text-muted">Time to Complete</dt>
-                <dd className="col-sm-9">{task.timeToComplete} day(s)</dd>
-              </dl>
-
-              <hr />
-
-              <div className="d-flex gap-2 flex-wrap">
-                {task.status !== "Completed" && (
-                  <button
-                    className="btn btn-success btn-sm"
-                    onClick={markComplete}
-                    disabled={busy}
-                  >
-                    Mark as Complete
-                  </button>
-                )}
+            <div className="d-flex gap-2 flex-wrap">
+              {task.status !== "Completed" && (
                 <button
-                  className="btn btn-outline-primary btn-sm"
-                  onClick={() => setShowEdit(true)}
+                  className="btn btn-success btn-sm"
+                  onClick={markComplete}
+                  disabled={busy}
                 >
-                  Edit
+                  Mark as Complete
                 </button>
-                <button
-                  className="btn btn-outline-danger btn-sm"
-                  onClick={() => setShowDelete(true)}
-                >
-                  Delete
-                </button>
-              </div>
+              )}
+              <button
+                className="btn btn-outline-primary btn-sm"
+                onClick={() => setShowEdit(true)}
+              >
+                Edit
+              </button>
+              <button
+                className="btn btn-outline-danger btn-sm"
+                onClick={() => setShowDelete(true)}
+              >
+                Delete
+              </button>
             </div>
           </div>
-        )}
-      </main>
+        </div>
+      )}
 
       {showEdit && task && (
         <TaskFormModal
@@ -241,7 +231,7 @@ function TaskDetail() {
           </p>
         </Modal>
       )}
-    </div>
+    </AppLayout>
   );
 }
 

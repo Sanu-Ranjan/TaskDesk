@@ -14,7 +14,7 @@ function Login() {
   const [submitting, setSubmitting] = useState(false);
 
   if (!loading && user) {
-    return <Navigate to={ROUTES.PROFILE} replace />;
+    return <Navigate to={ROUTES.DASHBOARD} replace />;
   }
 
   async function handleSubmit(e) {
@@ -23,7 +23,7 @@ function Login() {
     setSubmitting(true);
     try {
       await login({ email, password });
-      navigate(ROUTES.PROFILE);
+      navigate(ROUTES.DASHBOARD);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -32,42 +32,58 @@ function Login() {
   }
 
   return (
-    <div style={{ maxWidth: 320, margin: "60px auto", fontFamily: "system-ui" }}>
-      <h2>Log in</h2>
+    <div
+      className="d-flex align-items-center justify-content-center bg-light"
+      style={{ minHeight: "100vh" }}
+    >
+      <div className="card shadow-sm" style={{ width: "100%", maxWidth: 380 }}>
+        <div className="card-body p-4">
+          <h4 className="fw-bold text-primary text-center mb-1">TaskDesk</h4>
+          <p className="text-center text-muted mb-4">Log in to your account</p>
 
-      <form onSubmit={handleSubmit}>
-        <label>
-          Email
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            style={{ width: "100%", marginBottom: 12 }}
-          />
-        </label>
+          <form onSubmit={handleSubmit}>
+            <div className="mb-3">
+              <label className="form-label">Email</label>
+              <input
+                type="email"
+                className="form-control"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter your email"
+                required
+              />
+            </div>
 
-        <label>
-          Password
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            style={{ width: "100%", marginBottom: 12 }}
-          />
-        </label>
+            <div className="mb-3">
+              <label className="form-label">Password</label>
+              <input
+                type="password"
+                className="form-control"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Password"
+                required
+              />
+            </div>
 
-        <button type="submit" disabled={submitting}>
-          {submitting ? "Logging in..." : "Log in"}
-        </button>
-      </form>
+            <button
+              type="submit"
+              className="btn btn-primary w-100"
+              disabled={submitting}
+            >
+              {submitting ? "Logging in..." : "Sign in"}
+            </button>
+          </form>
 
-      {error && <p style={{ color: "crimson" }}>{error}</p>}
+          {error && (
+            <p className="text-danger text-center mt-3 mb-0">{error}</p>
+          )}
 
-      <p>
-        No account? <Link to={ROUTES.SIGNUP}>Sign up</Link>
-      </p>
+          <p className="text-center text-muted mt-3 mb-0">
+            No account? <Link to={ROUTES.SIGNUP}>Sign up</Link>
+          </p>
+        </div>
+      </div>
     </div>
   );
 }

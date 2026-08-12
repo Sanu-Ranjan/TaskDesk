@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 
-import Navigation from "../components/Navigation";
+import AppLayout from "../components/AppLayout";
 import Modal from "../components/Modal";
 import { apiGet, apiPost, apiDelete } from "../utils/api";
 import { API_ENDPOINTS } from "../constants/api";
@@ -36,82 +36,75 @@ function Teams() {
   }, [loadTeams]);
 
   return (
-    <div className="d-flex">
-      <Navigation />
+    <AppLayout>
+      <div className="d-flex align-items-center justify-content-between mb-4">
+        <h4 className="fw-bold mb-0">Teams</h4>
+        <button
+          className="btn btn-primary btn-sm"
+          onClick={() => setShowCreate(true)}
+        >
+          + New Team
+        </button>
+      </div>
 
-      <main
-        className="flex-grow-1 p-4 bg-light"
-        style={{ minHeight: "100vh", minWidth: 0 }}
-      >
-        <div className="d-flex align-items-center justify-content-between mb-4">
-          <h4 className="fw-bold mb-0">Teams</h4>
-          <button
-            className="btn btn-primary btn-sm"
-            onClick={() => setShowCreate(true)}
-          >
-            + New Team
-          </button>
-        </div>
+      {loading && <p className="text-muted">Loading teams...</p>}
+      {error && <p className="text-danger">Error: {error}</p>}
 
-        {loading && <p className="text-muted">Loading teams...</p>}
-        {error && <p className="text-danger">Error: {error}</p>}
+      {!loading && !error && (
+        <div className="row g-3">
+          {teams.length === 0 && (
+            <p className="text-muted">No teams yet. Create one.</p>
+          )}
+          {teams.map((team) => (
+            <div className="col-12 col-sm-6 col-lg-4" key={team._id}>
+              <div className="card h-100 shadow-sm">
+                <div className="card-body">
+                  <div className="d-flex justify-content-between align-items-start">
+                    <h6
+                      className="card-title fw-bold mb-1 text-primary"
+                      role="button"
+                      onClick={() =>
+                        navigate(ROUTES.TEAM_DETAIL.replace(":id", team._id))
+                      }
+                    >
+                      {team.name}
+                    </h6>
+                    <TeamMenu
+                      onEdit={() => setEditTeam(team)}
+                      onDelete={() => setDeleteTeam(team)}
+                    />
+                  </div>
 
-        {!loading && !error && (
-          <div className="row g-3">
-            {teams.length === 0 && (
-              <p className="text-muted">No teams yet. Create one.</p>
-            )}
-            {teams.map((team) => (
-              <div className="col-12 col-sm-6 col-lg-4" key={team._id}>
-                <div className="card h-100 shadow-sm">
-                  <div className="card-body">
-                    <div className="d-flex justify-content-between align-items-start">
-                      <h6
-                        className="card-title fw-bold mb-1 text-primary"
-                        role="button"
-                        onClick={() =>
-                          navigate(ROUTES.TEAM_DETAIL.replace(":id", team._id))
-                        }
+                  <p className="card-text text-muted small mb-2">
+                    {team.description}
+                  </p>
+
+                  <div className="d-flex align-items-center gap-1 flex-wrap">
+                    {(team.members || []).slice(0, 4).map((m) => (
+                      <span
+                        key={m._id}
+                        className="badge rounded-circle bg-secondary"
+                        title={m.name}
+                        style={{ width: 28, height: 28, lineHeight: "20px" }}
                       >
-                        {team.name}
-                      </h6>
-                      <TeamMenu
-                        onEdit={() => setEditTeam(team)}
-                        onDelete={() => setDeleteTeam(team)}
-                      />
-                    </div>
-
-                    <p className="card-text text-muted small mb-2">
-                      {team.description}
-                    </p>
-
-                    <div className="d-flex align-items-center gap-1 flex-wrap">
-                      {(team.members || []).slice(0, 4).map((m) => (
-                        <span
-                          key={m._id}
-                          className="badge rounded-circle bg-secondary"
-                          title={m.name}
-                          style={{ width: 28, height: 28, lineHeight: "20px" }}
-                        >
-                          {m.name?.[0]?.toUpperCase()}
-                        </span>
-                      ))}
-                      {(team.members || []).length > 4 && (
-                        <span className="badge rounded-pill bg-light text-dark border">
-                          +{team.members.length - 4}
-                        </span>
-                      )}
-                      {(team.members || []).length === 0 && (
-                        <span className="text-muted small">No members</span>
-                      )}
-                    </div>
+                        {m.name?.[0]?.toUpperCase()}
+                      </span>
+                    ))}
+                    {(team.members || []).length > 4 && (
+                      <span className="badge rounded-pill bg-light text-dark border">
+                        +{team.members.length - 4}
+                      </span>
+                    )}
+                    {(team.members || []).length === 0 && (
+                      <span className="text-muted small">No members</span>
+                    )}
                   </div>
                 </div>
               </div>
-            ))}
-          </div>
-        )}
-      </main>
+            </div>
+          ))}
+        </div>
+      )}
 
       {showCreate && (
         <CreateEditTeamModal
@@ -144,7 +137,7 @@ function Teams() {
           }}
         />
       )}
-    </div>
+    </AppLayout>
   );
 }
 

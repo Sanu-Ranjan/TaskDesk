@@ -29,52 +29,69 @@ function Signup() {
   }
 
   return (
-    <div style={{ maxWidth: 320, margin: "60px auto", fontFamily: "system-ui" }}>
-      <h2>Create account</h2>
+    <div
+      className="d-flex align-items-center justify-content-center bg-light"
+      style={{ minHeight: "100vh" }}
+    >
+      <div className="card shadow-sm" style={{ width: "100%", maxWidth: 380 }}>
+        <div className="card-body p-4">
+          <h4 className="fw-bold text-primary text-center mb-1">TaskDesk</h4>
+          <p className="text-center text-muted mb-4">Create your account</p>
 
-      <form onSubmit={handleSubmit}>
-        <label>
-          Name
-          <input
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-            style={{ width: "100%", marginBottom: 12 }}
-          />
-        </label>
+          <form onSubmit={handleSubmit}>
+            <div className="mb-3">
+              <label className="form-label">Name</label>
+              <input
+                className="form-control"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Enter your name"
+                required
+              />
+            </div>
 
-        <label>
-          Email
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            style={{ width: "100%", marginBottom: 12 }}
-          />
-        </label>
+            <div className="mb-3">
+              <label className="form-label">Email</label>
+              <input
+                type="email"
+                className="form-control"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter your email"
+                required
+              />
+            </div>
 
-        <label>
-          Password
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            style={{ width: "100%", marginBottom: 12 }}
-          />
-        </label>
+            <div className="mb-3">
+              <label className="form-label">Password</label>
+              <input
+                type="password"
+                className="form-control"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Create a password"
+                required
+              />
+            </div>
 
-        <button type="submit" disabled={submitting}>
-          {submitting ? "Creating..." : "Sign up"}
-        </button>
-      </form>
+            <button
+              type="submit"
+              className="btn btn-primary w-100"
+              disabled={submitting}
+            >
+              {submitting ? "Creating..." : "Sign up"}
+            </button>
+          </form>
 
-      {error && <p style={{ color: "crimson" }}>{error}</p>}
+          {error && (
+            <p className="text-danger text-center mt-3 mb-0">{error}</p>
+          )}
 
-      <p>
-        Already registered? <Link to={ROUTES.LOGIN}>Log in</Link>
-      </p>
+          <p className="text-center text-muted mt-3 mb-0">
+            Already registered? <Link to={ROUTES.LOGIN}>Log in</Link>
+          </p>
+        </div>
+      </div>
     </div>
   );
 }

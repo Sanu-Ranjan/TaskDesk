@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 
-import Navigation from "../components/Navigation";
+import AppLayout from "../components/AppLayout";
 import Modal from "../components/Modal";
 import { apiGet, apiPost, apiDelete } from "../utils/api";
 import { API_ENDPOINTS } from "../constants/api";
@@ -58,110 +58,103 @@ function Projects() {
   }, [loadProjects]);
 
   return (
-    <div className="d-flex">
-      <Navigation />
+    <AppLayout>
+      <div className="d-flex align-items-center justify-content-between mb-4">
+        <h4 className="fw-bold mb-0">Projects</h4>
+        <button
+          className="btn btn-primary btn-sm"
+          onClick={() => setShowCreate(true)}
+        >
+          + New Project
+        </button>
+      </div>
 
-      <main
-        className="flex-grow-1 p-4 bg-light"
-        style={{ minHeight: "100vh", minWidth: 0 }}
-      >
-        <div className="d-flex align-items-center justify-content-between mb-4">
-          <h4 className="fw-bold mb-0">Projects</h4>
-          <button
-            className="btn btn-primary btn-sm"
-            onClick={() => setShowCreate(true)}
-          >
-            + New Project
-          </button>
-        </div>
+      {error && <p className="text-danger">Error: {error}</p>}
 
-        {error && <p className="text-danger">Error: {error}</p>}
-
-        {projects.length === 0 && loading ? (
-          <p className="text-muted">Loading projects...</p>
-        ) : (
-          <div
-            style={{ opacity: loading ? 0.5 : 1, transition: "opacity 0.15s" }}
-          >
-            {projects.length === 0 ? (
-              <p className="text-muted">No projects yet. Create one.</p>
-            ) : (
-              <div className="row g-3">
-                {projects.map((p) => (
-                  <div className="col-12 col-sm-6 col-lg-4" key={p._id}>
-                    <div className="card h-100 shadow-sm">
-                      <div className="card-body">
-                        <div className="d-flex justify-content-between align-items-start">
-                          <h6
-                            className="card-title fw-bold text-primary mb-1"
-                            role="button"
-                            onClick={() =>
-                              navigate(
-                                ROUTES.PROJECT_DETAIL.replace(":id", p._id),
-                              )
-                            }
-                          >
-                            {p.name}
-                          </h6>
-                          <ProjectMenu
-                            onEdit={() => setEditProject(p)}
-                            onDelete={() => setDeleteProject(p)}
-                          />
-                        </div>
-                        <p className="card-text text-muted small mb-0">
-                          {p.description}
-                        </p>
+      {projects.length === 0 && loading ? (
+        <p className="text-muted">Loading projects...</p>
+      ) : (
+        <div
+          style={{ opacity: loading ? 0.5 : 1, transition: "opacity 0.15s" }}
+        >
+          {projects.length === 0 ? (
+            <p className="text-muted">No projects yet. Create one.</p>
+          ) : (
+            <div className="row g-3">
+              {projects.map((p) => (
+                <div className="col-12 col-sm-6 col-lg-4" key={p._id}>
+                  <div className="card h-100 shadow-sm">
+                    <div className="card-body">
+                      <div className="d-flex justify-content-between align-items-start">
+                        <h6
+                          className="card-title fw-bold text-primary mb-1"
+                          role="button"
+                          onClick={() =>
+                            navigate(
+                              ROUTES.PROJECT_DETAIL.replace(":id", p._id),
+                            )
+                          }
+                        >
+                          {p.name}
+                        </h6>
+                        <ProjectMenu
+                          onEdit={() => setEditProject(p)}
+                          onDelete={() => setDeleteProject(p)}
+                        />
                       </div>
+                      <p className="card-text text-muted small mb-0">
+                        {p.description}
+                      </p>
                     </div>
                   </div>
-                ))}
-              </div>
-            )}
+                </div>
+              ))}
+            </div>
+          )}
 
-            {totalPages > 1 && (
-              <nav className="mt-3">
-                <ul className="pagination pagination-sm mb-0">
-                  <li className={`page-item ${page <= 1 ? "disabled" : ""}`}>
-                    <button
-                      className="page-link"
-                      onClick={() => patchParams({ page: page - 1 })}
-                    >
-                      Prev
-                    </button>
-                  </li>
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                    (n) => (
-                      <li
-                        className={`page-item ${n === page ? "active" : ""}`}
-                        key={n}
-                      >
-                        <button
-                          className="page-link"
-                          onClick={() => patchParams({ page: n })}
-                        >
-                          {n}
-                        </button>
-                      </li>
-                    ),
-                  )}
-                  <li
-                    className={`page-item ${
-                      page >= totalPages ? "disabled" : ""
-                    }`}
+          {totalPages > 1 && (
+            <nav className="mt-3">
+              <ul className="pagination pagination-sm mb-0">
+                <li className={`page-item ${page <= 1 ? "disabled" : ""}`}>
+                  <button
+                    className="page-link"
+                    onClick={() => patchParams({ page: page - 1 })}
                   >
-                    <button
-                      className="page-link"
-                      onClick={() => patchParams({ page: page + 1 })}
+                    Prev
+                  </button>
+                </li>
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                  (n) => (
+                    <li
+                      className={`page-item ${n === page ? "active" : ""}`}
+                      key={n}
                     >
-                      Next
-                    </button>
-                  </li>
-                </ul>
-              </nav>
-            )}
-          </div>
-        )}
-      </main>
+                      <button
+                        className="page-link"
+                        onClick={() => patchParams({ page: n })}
+                      >
+                        {n}
+                      </button>
+                    </li>
+                  ),
+                )}
+                <li
+                  className={`page-item ${
+                    page >= totalPages ? "disabled" : ""
+                  }`}
+                >
+                  <button
+                    className="page-link"
+                    onClick={() => patchParams({ page: page + 1 })}
+                  >
+                    Next
+                  </button>
+                </li>
+              </ul>
+            </nav>
+          )}
+        </div>
+      )}
 
       {showCreate && (
         <CreateEditProjectModal
@@ -194,7 +187,7 @@ function Projects() {
           }}
         />
       )}
-    </div>
+    </AppLayout>
   );
 }
 
