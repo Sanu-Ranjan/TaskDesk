@@ -57,22 +57,24 @@ function Teams() {
           )}
           {teams.map((team) => (
             <div className="col-12 col-sm-6 col-lg-4" key={team._id}>
-              <div className="card h-100 shadow-sm">
+              <div
+                className="card h-100 shadow-sm"
+                role="button"
+                onClick={() =>
+                  navigate(ROUTES.TEAM_DETAIL.replace(":id", team._id))
+                }
+              >
                 <div className="card-body">
                   <div className="d-flex justify-content-between align-items-start">
-                    <h6
-                      className="card-title fw-bold mb-1 text-primary"
-                      role="button"
-                      onClick={() =>
-                        navigate(ROUTES.TEAM_DETAIL.replace(":id", team._id))
-                      }
-                    >
+                    <h6 className="card-title fw-bold mb-1 text-primary">
                       {team.name}
                     </h6>
-                    <TeamMenu
-                      onEdit={() => setEditTeam(team)}
-                      onDelete={() => setDeleteTeam(team)}
-                    />
+                    <div onClick={(e) => e.stopPropagation()}>
+                      <TeamMenu
+                        onEdit={() => setEditTeam(team)}
+                        onDelete={() => setDeleteTeam(team)}
+                      />
+                    </div>
                   </div>
 
                   <p className="card-text text-muted small mb-2">
