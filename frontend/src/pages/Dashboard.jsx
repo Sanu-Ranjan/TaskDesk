@@ -17,7 +17,9 @@ function Dashboard() {
 
   // URL is the source of truth for filter + page numbers
   const statusFilter = searchParams.get("status") || "";
-  const mine = searchParams.get("mine") === "1";
+  const ownerFilter = searchParams.get("owner") || "";
+  // "my tasks" is active when the URL owner is the logged-in user
+  const mine = Boolean(user?._id) && ownerFilter === user._id;
   const projectPage = Math.max(
     1,
     parseInt(searchParams.get("projectPage")) || 1,
@@ -86,7 +88,7 @@ function Dashboard() {
       try {
         const params = { page: taskPage, limit: PAGE_LIMIT };
         if (statusFilter) params.status = statusFilter;
-        if (mine && user?._id) params.owner = user._id;
+        if (ownerFilter) params.owner = ownerFilter;
         const body = await apiGet(API_ENDPOINTS.TASKS.BASE, params);
         if (!active) return;
         setTasks(body.data.tasks);
@@ -100,7 +102,7 @@ function Dashboard() {
     return () => {
       active = false;
     };
-  }, [taskPage, statusFilter, mine, user]);
+  }, [taskPage, statusFilter, ownerFilter]);
 
   // changing the filter resets task page to 1
   function handleStatusChange(status) {
@@ -157,7 +159,7 @@ function Dashboard() {
                 className={`btn ${
                   mine ? "btn-outline-primary" : "btn-primary"
                 }`}
-                onClick={() => patchParams({ mine: null, taskPage: null })}
+                onClick={() => patchParams({ owner: null, taskPage: null })}
               >
                 All Tasks
               </button>
@@ -165,7 +167,10 @@ function Dashboard() {
                 className={`btn ${
                   mine ? "btn-primary" : "btn-outline-primary"
                 }`}
-                onClick={() => patchParams({ mine: "1", taskPage: null })}
+                disabled={!user?._id}
+                onClick={() =>
+                  patchParams({ owner: user?._id || null, taskPage: null })
+                }
               >
                 My Tasks
               </button>
