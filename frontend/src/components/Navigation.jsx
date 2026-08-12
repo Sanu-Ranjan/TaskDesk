@@ -1,6 +1,5 @@
 import { NavLink } from "react-router-dom";
 
-import { useAuth } from "../contexts/AuthContext";
 import { ROUTES } from "../constants/route";
 
 const NAV_ITEMS = [
@@ -12,8 +11,6 @@ const NAV_ITEMS = [
 ];
 
 function Navigation() {
-  const { logout } = useAuth();
-
   return (
     <nav
       className="d-flex flex-column bg-white border-end p-3 flex-shrink-0"
@@ -40,14 +37,6 @@ function Navigation() {
           </li>
         ))}
       </ul>
-
-      <button
-        className="btn btn-outline-secondary btn-sm mt-3"
-        onClick={logout}
-      >
-        <i className="bi bi-box-arrow-right me-1" />
-        Logout
-      </button>
     </nav>
   );
 }

@@ -1,12 +1,21 @@
-import { useAuth } from "../contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 
-// Thin top bar showing who is logged in. Sits above the main content
-// of a page (to the right of the sidebar).
+import { useAuth } from "../contexts/AuthContext";
+import { ROUTES } from "../constants/route";
+
+// Thin top bar showing who is logged in, with a logout button in the
+// top-right corner. Sits above the main content of a page.
 function TopBar() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  async function handleLogout() {
+    await logout();
+    navigate(ROUTES.LOGIN);
+  }
 
   return (
-    <div className="d-flex align-items-center justify-content-end bg-white border-bottom px-4 py-2">
+    <div className="d-flex align-items-center justify-content-end gap-3 bg-white border-bottom px-4 py-2">
       {user && (
         <div className="d-flex align-items-center gap-2">
           <span
@@ -23,6 +32,15 @@ function TopBar() {
           </div>
         </div>
       )}
+
+      <button
+        className="btn btn-sm btn-outline-secondary border-0"
+        onClick={handleLogout}
+        title="Log out"
+        aria-label="Log out"
+      >
+        <i className="bi bi-box-arrow-right fs-5" />
+      </button>
     </div>
   );
 }
