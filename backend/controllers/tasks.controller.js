@@ -180,7 +180,7 @@ async function clampPage(page, limit, filter = {}) {
   const { data: count, error } = await dbTask(() =>
     Task.countDocuments(filter),
   );
-  const totalPages = Math.ceil(count / limit);
+  const totalPages = Math.max(1, Math.ceil(count / limit));
 
   page = Math.max(1, page || 1);
   page = Math.min(totalPages, page);
