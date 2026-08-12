@@ -1,4 +1,5 @@
 const Task = require("../models/Task");
+const mongoose = require("mongoose");
 const { TASK_STATUS, TASK_PRIORITY } = require("../constants");
 const { dbError, failure, serverError, success } = require("../utils/res");
 const { dbTask } = require("../utils/wrapper");
@@ -130,8 +131,21 @@ const getTasks = async (req, res) => {
         case: { $eq: ["$priority", p] },
         then: PRIORITY_RANK[p],
       }));
+
+      // aggregation does NOT auto-cast strings to ObjectId the way
+      // find() does, so cast the id filters explicitly
+      const matchStage = { ...filter };
+      ["project", "team"].forEach((key) => {
+        if (matchStage[key]) {
+          matchStage[key] = new mongoose.Types.ObjectId(matchStage[key]);
+        }
+      });
+      if (matchStage.owners) {
+        matchStage.owners = new mongoose.Types.ObjectId(matchStage.owners);
+      }
+
       query = Task.aggregate([
-        { $match: filter },
+        { $match: matchStage },
         {
           $addFields: {
             _priorityRank: {
