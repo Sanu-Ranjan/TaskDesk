@@ -1,32 +1,17 @@
 import { useEffect, useState, useCallback } from "react";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 
 import { apiGet } from "../utils/api";
 import { API_ENDPOINTS } from "../constants/api";
-import { ROUTES } from "../constants/route";
+import TaskTable from "./TaskTable";
 import { TASK_STATUSES, SORT_OPTIONS } from "../constants/task";
 
 const PAGE_LIMIT = 10;
-
-const STATUS_BADGE = {
-  "To Do": "bg-secondary-subtle text-secondary-emphasis",
-  "In Progress": "bg-warning-subtle text-warning-emphasis",
-  Completed: "bg-success-subtle text-success-emphasis",
-  Blocked: "bg-danger-subtle text-danger-emphasis",
-};
-
-const PRIORITY_BADGE = {
-  Low: "bg-light text-dark border",
-  Medium: "bg-info-subtle text-info-emphasis",
-  High: "bg-warning-subtle text-warning-emphasis",
-  Urgent: "bg-danger-subtle text-danger-emphasis",
-};
 
 // Tasks belonging to one team, with owner/tag/status filters, sort,
 // and pagination. Filters live in the URL so the view is shareable.
 function TeamTasks({ teamId }) {
   const [searchParams, setSearchParams] = useSearchParams();
-  const navigate = useNavigate();
 
   const [tasks, setTasks] = useState([]);
   const [totalPages, setTotalPages] = useState(1);
@@ -90,74 +75,71 @@ function TeamTasks({ teamId }) {
     loadTasks();
   }, [loadTasks]);
 
-  function fmtDate(d) {
-    if (!d) return "-";
-    return new Date(d).toLocaleDateString(undefined, {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-    });
-  }
-
   return (
     <>
       <h6 className="text-uppercase text-muted small mt-5 mb-3">Tasks</h6>
 
-      <div className="d-flex flex-wrap gap-2 mb-3">
-        <select
-          className="form-select form-select-sm"
-          style={{ width: "auto" }}
-          value={owner}
-          onChange={(e) => patchParams({ owner: e.target.value, page: null })}
-        >
-          <option value="">All owners</option>
-          {users.map((u) => (
-            <option key={u._id} value={u._id}>
-              {u.name}
-            </option>
-          ))}
-        </select>
+      <div className="row g-2 mb-3">
+        <div className="col-6 col-md-auto">
+          <select
+            className="form-select form-select-sm"
+            value={owner}
+            onChange={(e) => patchParams({ owner: e.target.value, page: null })}
+          >
+            <option value="">All owners</option>
+            {users.map((u) => (
+              <option key={u._id} value={u._id}>
+                {u.name}
+              </option>
+            ))}
+          </select>
+        </div>
 
-        <select
-          className="form-select form-select-sm"
-          style={{ width: "auto" }}
-          value={tag}
-          onChange={(e) => patchParams({ tag: e.target.value, page: null })}
-        >
-          <option value="">All tags</option>
-          {allTags.map((t) => (
-            <option key={t._id} value={t.name}>
-              {t.name}
-            </option>
-          ))}
-        </select>
+        <div className="col-6 col-md-auto">
+          <select
+            className="form-select form-select-sm"
+            value={tag}
+            onChange={(e) => patchParams({ tag: e.target.value, page: null })}
+          >
+            <option value="">All tags</option>
+            {allTags.map((t) => (
+              <option key={t._id} value={t.name}>
+                {t.name}
+              </option>
+            ))}
+          </select>
+        </div>
 
-        <select
-          className="form-select form-select-sm"
-          style={{ width: "auto" }}
-          value={status}
-          onChange={(e) => patchParams({ status: e.target.value, page: null })}
-        >
-          <option value="">All statuses</option>
-          {TASK_STATUSES.map((s) => (
-            <option key={s} value={s}>
-              {s}
-            </option>
-          ))}
-        </select>
+        <div className="col-6 col-md-auto">
+          <select
+            className="form-select form-select-sm"
+            value={status}
+            onChange={(e) =>
+              patchParams({ status: e.target.value, page: null })
+            }
+          >
+            <option value="">All statuses</option>
+            {TASK_STATUSES.map((s) => (
+              <option key={s} value={s}>
+                {s}
+              </option>
+            ))}
+          </select>
+        </div>
 
-        <select
-          className="form-select form-select-sm ms-auto"
-          style={{ width: "auto" }}
-          value={sort}
-          onChange={(e) => patchParams({ sort: e.target.value, page: null })}
-        >
-          {SORT_OPTIONS.map((o) => (
-            <option key={o.value} value={o.value}>
-              {o.label}
-            </option>
-          ))}
-        </select>
+        <div className="col-6 col-md-auto ms-md-auto">
+          <select
+            className="form-select form-select-sm"
+            value={sort}
+            onChange={(e) => patchParams({ sort: e.target.value, page: null })}
+          >
+            {SORT_OPTIONS.map((o) => (
+              <option key={o.value} value={o.value}>
+                {o.label}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       {error && <p className="text-danger">Error: {error}</p>}
@@ -171,57 +153,7 @@ function TeamTasks({ teamId }) {
           {tasks.length === 0 ? (
             <p className="text-muted">No tasks match these filters.</p>
           ) : (
-            <div className="table-responsive bg-white rounded shadow-sm">
-              <table className="table table-hover align-middle mb-0">
-                <thead className="table-light">
-                  <tr>
-                    <th>Task</th>
-                    <th>Project</th>
-                    <th>Owner</th>
-                    <th>Priority</th>
-                    <th>Due</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {tasks.map((t) => (
-                    <tr
-                      key={t._id}
-                      role="button"
-                      onClick={() =>
-                        navigate(ROUTES.TASK_DETAIL.replace(":id", t._id))
-                      }
-                    >
-                      <td className="fw-medium">{t.name}</td>
-                      <td>{t.project?.name || "-"}</td>
-                      <td>
-                        {(t.owners || []).map((o) => o.name).join(", ") || "-"}
-                      </td>
-                      <td>
-                        <span
-                          className={`badge ${
-                            PRIORITY_BADGE[t.priority] || "bg-light text-dark"
-                          }`}
-                        >
-                          {t.priority}
-                        </span>
-                      </td>
-                      <td>{fmtDate(t.dueDate)}</td>
-                      <td>
-                        <span
-                          className={`badge ${
-                            STATUS_BADGE[t.status] ||
-                            "bg-secondary-subtle text-secondary-emphasis"
-                          }`}
-                        >
-                          {t.status}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <TaskTable tasks={tasks} showProject={true} />
           )}
 
           {totalPages > 1 && (

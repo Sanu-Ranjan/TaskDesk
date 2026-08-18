@@ -73,22 +73,27 @@ function TeamDetail() {
               {team.members.map((m) => (
                 <li
                   key={m._id}
-                  className="list-group-item d-flex align-items-center justify-content-between"
+                  className="list-group-item d-flex align-items-center justify-content-between gap-2"
                 >
-                  <span className="d-flex align-items-center gap-2">
+                  <span
+                    className="d-flex align-items-center gap-2"
+                    style={{ minWidth: 0 }}
+                  >
                     <span
-                      className="badge rounded-circle bg-secondary"
+                      className="badge rounded-circle bg-secondary flex-shrink-0"
                       style={{ width: 32, height: 32, lineHeight: "24px" }}
                     >
                       {m.name?.[0]?.toUpperCase()}
                     </span>
-                    <span>
-                      {m.name}
-                      <span className="text-muted small ms-2">{m.email}</span>
+                    <span className="lh-sm" style={{ minWidth: 0 }}>
+                      <div className="text-truncate">{m.name}</div>
+                      <div className="text-muted small text-truncate">
+                        {m.email}
+                      </div>
                     </span>
                   </span>
                   <button
-                    className="btn btn-sm btn-outline-danger"
+                    className="btn btn-sm btn-outline-danger flex-shrink-0"
                     onClick={() => handleRemove(m._id)}
                   >
                     Remove

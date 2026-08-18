@@ -77,7 +77,7 @@ function Teams() {
                     </div>
                   </div>
 
-                  <p className="card-text text-muted small mb-2">
+                  <p className="card-text text-muted small mb-2 clamp-2">
                     {team.description}
                   </p>
 

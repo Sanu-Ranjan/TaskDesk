@@ -1,13 +1,9 @@
 import { useEffect, useState, useCallback } from "react";
-import {
-  useParams,
-  useSearchParams,
-  useNavigate,
-  Link,
-} from "react-router-dom";
+import { useParams, useSearchParams, Link } from "react-router-dom";
 
 import AppLayout from "../components/AppLayout";
 import TaskFormModal from "../components/TaskFormModal";
+import TaskTable from "../components/TaskTable";
 import { apiGet } from "../utils/api";
 import { API_ENDPOINTS } from "../constants/api";
 import { ROUTES } from "../constants/route";
@@ -15,23 +11,8 @@ import { TASK_STATUSES, SORT_OPTIONS } from "../constants/task";
 
 const PAGE_LIMIT = 10;
 
-const STATUS_BADGE = {
-  "To Do": "bg-secondary-subtle text-secondary-emphasis",
-  "In Progress": "bg-warning-subtle text-warning-emphasis",
-  Completed: "bg-success-subtle text-success-emphasis",
-  Blocked: "bg-danger-subtle text-danger-emphasis",
-};
-
-const PRIORITY_BADGE = {
-  Low: "bg-light text-dark border",
-  Medium: "bg-info-subtle text-info-emphasis",
-  High: "bg-warning-subtle text-warning-emphasis",
-  Urgent: "bg-danger-subtle text-danger-emphasis",
-};
-
 function ProjectDetail() {
   const { id } = useParams();
-  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const [project, setProject] = useState(null);
@@ -113,27 +94,18 @@ function ProjectDetail() {
     loadTasks();
   }, [loadTasks]);
 
-  function fmtDate(d) {
-    if (!d) return "-";
-    return new Date(d).toLocaleDateString(undefined, {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-    });
-  }
-
   return (
     <AppLayout>
       <Link to={ROUTES.DASHBOARD} className="text-decoration-none small">
         &larr; Back to Dashboard
       </Link>
 
-      <div className="d-flex align-items-center justify-content-between mt-3 mb-1">
+      <div className="d-flex flex-column flex-sm-row align-items-sm-center justify-content-sm-between gap-2 mt-3 mb-1">
         <h4 className="fw-bold mb-0">
           Project: {project ? project.name : "..."}
         </h4>
         <button
-          className="btn btn-primary btn-sm"
+          className="btn btn-primary btn-sm flex-shrink-0"
           onClick={() => setShowCreate(true)}
         >
           + New Task
@@ -144,61 +116,67 @@ function ProjectDetail() {
       )}
 
       {/* filters + sort */}
-      <div className="d-flex flex-wrap gap-2 my-3">
-        <select
-          className="form-select form-select-sm"
-          style={{ width: "auto" }}
-          value={owner}
-          onChange={(e) => patchParams({ owner: e.target.value, page: null })}
-        >
-          <option value="">All owners</option>
-          {users.map((u) => (
-            <option key={u._id} value={u._id}>
-              {u.name}
-            </option>
-          ))}
-        </select>
+      <div className="row g-2 my-3">
+        <div className="col-6 col-md-auto">
+          <select
+            className="form-select form-select-sm"
+            value={owner}
+            onChange={(e) => patchParams({ owner: e.target.value, page: null })}
+          >
+            <option value="">All owners</option>
+            {users.map((u) => (
+              <option key={u._id} value={u._id}>
+                {u.name}
+              </option>
+            ))}
+          </select>
+        </div>
 
-        <select
-          className="form-select form-select-sm"
-          style={{ width: "auto" }}
-          value={tag}
-          onChange={(e) => patchParams({ tag: e.target.value, page: null })}
-        >
-          <option value="">All tags</option>
-          {allTags.map((t) => (
-            <option key={t._id} value={t.name}>
-              {t.name}
-            </option>
-          ))}
-        </select>
+        <div className="col-6 col-md-auto">
+          <select
+            className="form-select form-select-sm"
+            value={tag}
+            onChange={(e) => patchParams({ tag: e.target.value, page: null })}
+          >
+            <option value="">All tags</option>
+            {allTags.map((t) => (
+              <option key={t._id} value={t.name}>
+                {t.name}
+              </option>
+            ))}
+          </select>
+        </div>
 
-        <select
-          className="form-select form-select-sm"
-          style={{ width: "auto" }}
-          value={status}
-          onChange={(e) => patchParams({ status: e.target.value, page: null })}
-        >
-          <option value="">All statuses</option>
-          {TASK_STATUSES.map((s) => (
-            <option key={s} value={s}>
-              {s}
-            </option>
-          ))}
-        </select>
+        <div className="col-6 col-md-auto">
+          <select
+            className="form-select form-select-sm"
+            value={status}
+            onChange={(e) =>
+              patchParams({ status: e.target.value, page: null })
+            }
+          >
+            <option value="">All statuses</option>
+            {TASK_STATUSES.map((s) => (
+              <option key={s} value={s}>
+                {s}
+              </option>
+            ))}
+          </select>
+        </div>
 
-        <select
-          className="form-select form-select-sm ms-auto"
-          style={{ width: "auto" }}
-          value={sort}
-          onChange={(e) => patchParams({ sort: e.target.value, page: null })}
-        >
-          {SORT_OPTIONS.map((o) => (
-            <option key={o.value} value={o.value}>
-              {o.label}
-            </option>
-          ))}
-        </select>
+        <div className="col-6 col-md-auto ms-md-auto">
+          <select
+            className="form-select form-select-sm"
+            value={sort}
+            onChange={(e) => patchParams({ sort: e.target.value, page: null })}
+          >
+            {SORT_OPTIONS.map((o) => (
+              <option key={o.value} value={o.value}>
+                {o.label}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       {error && <p className="text-danger">Error: {error}</p>}
@@ -215,55 +193,7 @@ function ProjectDetail() {
           {tasks.length === 0 ? (
             <p className="text-muted">No tasks match these filters.</p>
           ) : (
-            <div className="table-responsive bg-white rounded shadow-sm">
-              <table className="table table-hover align-middle mb-0">
-                <thead className="table-light">
-                  <tr>
-                    <th>Task</th>
-                    <th>Owner</th>
-                    <th>Priority</th>
-                    <th>Due</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {tasks.map((t) => (
-                    <tr
-                      key={t._id}
-                      role="button"
-                      onClick={() =>
-                        navigate(ROUTES.TASK_DETAIL.replace(":id", t._id))
-                      }
-                    >
-                      <td className="fw-medium">{t.name}</td>
-                      <td>
-                        {(t.owners || []).map((o) => o.name).join(", ") || "-"}
-                      </td>
-                      <td>
-                        <span
-                          className={`badge ${
-                            PRIORITY_BADGE[t.priority] || "bg-light text-dark"
-                          }`}
-                        >
-                          {t.priority}
-                        </span>
-                      </td>
-                      <td>{fmtDate(t.dueDate)}</td>
-                      <td>
-                        <span
-                          className={`badge ${
-                            STATUS_BADGE[t.status] ||
-                            "bg-secondary-subtle text-secondary-emphasis"
-                          }`}
-                        >
-                          {t.status}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <TaskTable tasks={tasks} />
           )}
 
           {totalPages > 1 && (

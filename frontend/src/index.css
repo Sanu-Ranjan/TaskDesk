@@ -1,0 +1,38 @@
+/* Sidebar: static column on large screens, off-canvas drawer below lg */
+
+.taskdesk-sidebar {
+  width: 220px;
+  min-height: 100vh;
+}
+
+@media (max-width: 991.98px) {
+  .taskdesk-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    z-index: 1045;
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+  }
+  .taskdesk-sidebar.is-open {
+    transform: translateX(0);
+    box-shadow: 0 0 24px rgba(0, 0, 0, 0.15);
+  }
+}
+
+/* Clamp long text to N lines with an ellipsis, so cards stay uniform */
+.clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
