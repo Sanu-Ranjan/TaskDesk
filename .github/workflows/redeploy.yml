@@ -1,0 +1,30 @@
+name: redeploy TaskDesk
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  redeploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: ssh vps and deploy
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{secrets.VPS_HOST}}
+          username: ${{secrets.VPS_USER}}
+          key: ${{secrets.VPS_SSH_KEY}}
+          script: |
+            source ~/.nvm/nvm.sh
+            cd /root/taskdesk/workasana
+            git checkout main && git pull
+            cd backend
+            npm i
+            pm2 restart task-desk-backend
+            pm2 save
+            cd /root/taskdesk/workasana/frontend
+            npm i
+            npm run build
+            rm -rf /var/www/taskdesk/client/dist/*
+            cp -r dist/* /var/www/taskdesk/client/dist/
